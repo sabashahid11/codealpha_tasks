@@ -127,4 +127,3 @@ message_label.pack(pady=10)
 
 new_game()
 root.mainloop()
-
