@@ -38,3 +38,20 @@ A graphical word guessing game built with Tkinter GUI.
 
 1. Clone or download this repository
 2. Run any program using Python:
+python stock_tracker.py
+python chatbot.py
+python hangman.py
+
+
+
+**Note for Hangman Game:** Requires Tkinter library (usually included with Python installation)
+
+## Requirements
+- Python 3.x
+- Tkinter (for Hangman Game - usually pre-installed with Python)
+
+## Author
+Saba Shahid (@sabashahid11)
+
+## License
+Open source - free to use for learning purposes.
