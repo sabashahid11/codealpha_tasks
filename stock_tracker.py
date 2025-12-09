@@ -10,188 +10,267 @@ def stock_portfolio_tracker():
         "NFLX": 510.25
     }
     
-    print("=" * 50)
-    print("STOCK PORTFOLIO TRACKER")
-    print("=" * 50)
-    
-    print("\nAvailable stocks and their current prices:")
-    for stock, price in stock_prices.items():
-        print(f"{stock}: ${price:.2f}")
-    
-    print("\n" + "-" * 50)
-    
     portfolio = {}
-    total_investment = 0
     
     while True:
-        stock_name = input("\nEnter stock symbol (or type 'done' to finish): ").upper()
-        
-        if stock_name == 'DONE':
-            break
-            
-        if stock_name not in stock_prices:
-            print(f"Error: {stock_name} is not in our database. Please enter a valid stock symbol.")
-            continue
-            
-        try:
-            quantity = int(input(f"Enter quantity for {stock_name}: "))
-            if quantity <= 0:
-                print("Quantity must be a positive number. Please try again.")
-                continue
-        except ValueError:
-            print("Invalid input. Please enter a valid number for quantity.")
-            continue
-        
-        stock_value = stock_prices[stock_name] * quantity
-        portfolio[stock_name] = {
-            'quantity': quantity,
-            'price_per_share': stock_prices[stock_name],
-            'total_value': stock_value
-        }
-        
-        total_investment += stock_value
-        
-        print(f"Added {quantity} shares of {stock_name} at ${stock_prices[stock_name]:.2f} each")
-        print(f"Current total investment: ${total_investment:.2f}")
-    
-    print("\n" + "=" * 50)
-    print("PORTFOLIO SUMMARY")
-    print("=" * 50)
-    
-    if not portfolio:
-        print("No stocks in portfolio.")
-        return
-    
-    print("\nStock Holdings:")
-    print("-" * 40)
-    print(f"{'Stock':<10} {'Qty':<10} {'Price/Share':<15} {'Total Value':<15}")
-    print("-" * 40)
-    
-    for stock, details in portfolio.items():
-        print(f"{stock:<10} {details['quantity']:<10} ${details['price_per_share']:<14.2f} ${details['total_value']:<14.2f}")
-    
-    print("-" * 40)
-    print(f"\nTOTAL INVESTMENT: ${total_investment:.2f}")
-    
-    save_option = input("\nDo you want to save the portfolio to a file? (yes/no): ").lower()
-    
-    if save_option in ['yes', 'y']:
-        print("\nChoose file format:")
-        print("1. Text file (.txt)")
-        print("2. CSV file (.csv)")
+        print("\n" + "="*60)
+        print("STOCK PORTFOLIO TRACKER MAIN MENU")
+        print("="*60)
+        print("1. Add or Manage Stocks")
+        print("2. View Portfolio")
+        print("3. View Available Stocks")
+        print("4. Save Portfolio to File")
+        print("5. Clear Portfolio")
+        print("6. Exit")
+        print("-"*60)
         
         try:
-            choice = int(input("Enter your choice (1 or 2): "))
+            choice = input("\nEnter choice (1 6): ").strip()
             
-            if choice == 1:
-                save_to_txt(portfolio, total_investment)
-            elif choice == 2:
-                save_to_csv(portfolio, total_investment)
+            if choice == "1":
+                while True:
+                    print("\n" + "-"*50)
+                    print("ADD OR MANAGE STOCKS")
+                    print("-"*50)
+                    
+                    if portfolio:
+                        total = 0
+                        print("\nCurrent Portfolio:")
+                        for stock, qty in portfolio.items():
+                            value = stock_prices[stock] * qty
+                            total += value
+                            print(f"  {stock}: {qty} shares = ${value:.2f}")
+                        print(f"  Current Total: ${total:.2f}")
+                    
+                    print(f"\nAvailable stocks: {list(stock_prices.keys())}")
+                    
+                    stock = input("\nEnter stock symbol (or 'back' to return): ").upper().strip()
+                    
+                    if stock == "BACK":
+                        break
+                    
+                    if stock not in stock_prices:
+                        print(f"'{stock}' not found! Available: {list(stock_prices.keys())}")
+                        continue
+                    
+                    try:
+                        qty = int(input(f"Quantity for {stock}: "))
+                        if qty <= 0:
+                            print("Quantity must be positive!")
+                            continue
+                    except ValueError:
+                        print("Enter a valid number!")
+                        continue
+                    
+                    portfolio[stock] = portfolio.get(stock, 0) + qty
+                    value = stock_prices[stock] * qty
+                    print(f"Added {qty} shares of {stock} = ${value:.2f}")
+            
+            elif choice == "2":
+                print("\n" + "="*50)
+                print("YOUR PORTFOLIO")
+                print("="*50)
+                
+                if not portfolio:
+                    print("Portfolio is empty!")
+                    input("\nPress Enter to continue...")
+                    continue
+                
+                total = 0
+                print("\nStock Holdings:")
+                print("-"*45)
+                print(f"{'Stock':<8} {'Qty':<8} {'Price':<12} {'Value':<15}")
+                print("-"*45)
+                
+                for stock, qty in portfolio.items():
+                    price = stock_prices[stock]
+                    value = price * qty
+                    total += value
+                    print(f"{stock:<8} {qty:<8} ${price:<11.2f} ${value:<14.2f}")
+                
+                print("-"*45)
+                print(f"\nTOTAL INVESTMENT: ${total:.2f}")
+                
+                print("\nOptions:")
+                print("1. Return to Main Menu")
+                print("2. Remove a stock")
+                print("3. Clear Portfolio")
+                
+                sub_choice = input("\nEnter choice (1 3): ").strip()
+                
+                if sub_choice == "2":
+                    stock = input("Enter stock symbol to remove: ").upper().strip()
+                    if stock in portfolio:
+                        del portfolio[stock]
+                        print(f"Removed {stock} from portfolio")
+                    else:
+                        print(f"{stock} not in portfolio")
+                
+                elif sub_choice == "3":
+                    if input("Clear entire portfolio? (yes or no): ").lower() == "yes":
+                        portfolio.clear()
+                        print("Portfolio cleared!")
+            
+            elif choice == "3":
+                print("\n" + "="*50)
+                print("AVAILABLE STOCKS AND PRICES")
+                print("="*50)
+                
+                print(f"\n{'Stock':<8} {'Price':<12}")
+                print("-"*25)
+                for stock, price in stock_prices.items():
+                    print(f"{stock:<8} ${price:<11.2f}")
+                
+                input("\nPress Enter to continue...")
+            
+            elif choice == "4":
+                if not portfolio:
+                    print("Portfolio is empty! Add stocks first.")
+                    continue
+                
+                print("\n" + "-"*50)
+                print("SAVE PORTFOLIO")
+                print("-"*50)
+                print("\n1. Save as Text File (.txt)")
+                print("2. Save as CSV File (.csv)")
+                print("3. Back to Main Menu")
+                
+                save_choice = input("\nEnter choice (1 3): ").strip()
+                
+                if save_choice == "1":
+                    filename = input("Enter filename (or press Enter for 'portfolio.txt'): ").strip()
+                    if not filename:
+                        filename = "portfolio.txt"
+                    elif not filename.endswith('.txt'):
+                        filename += '.txt'
+                    
+                    total = sum(stock_prices[stock] * qty for stock, qty in portfolio.items())
+                    
+                    with open(filename, 'w') as f:
+                        f.write("STOCK PORTFOLIO\n")
+                        f.write("="*50 + "\n\n")
+                        for stock, qty in portfolio.items():
+                            value = stock_prices[stock] * qty
+                            f.write(f"{stock}: {qty} shares at ${stock_prices[stock]:.2f} = ${value:.2f}\n")
+                        f.write("\n" + "="*50 + "\n")
+                        f.write(f"TOTAL INVESTMENT: ${total:.2f}\n")
+                    
+                    print(f"Portfolio saved to {filename}")
+                
+                elif save_choice == "2":
+                    filename = input("Enter filename (or press Enter for 'portfolio.csv'): ").strip()
+                    if not filename:
+                        filename = "portfolio.csv"
+                    elif not filename.endswith('.csv'):
+                        filename += '.csv'
+                    
+                    total = sum(stock_prices[stock] * qty for stock, qty in portfolio.items())
+                    
+                    with open(filename, 'w', newline='') as f:
+                        f.write("Stock,Quantity,Price per Share,Total Value\n")
+                        for stock, qty in portfolio.items():
+                            value = stock_prices[stock] * qty
+                            f.write(f"{stock},{qty},{stock_prices[stock]:.2f},{value:.2f}\n")
+                        f.write(f"TOTAL,,,{total:.2f}\n")
+                    
+                    print(f"Portfolio saved to {filename}")
+            
+            elif choice == "5":
+                if portfolio:
+                    confirm = input("Clear entire portfolio? (yes or no): ").lower().strip()
+                    if confirm == "yes":
+                        portfolio.clear()
+                        print("Portfolio cleared!")
+                else:
+                    print("Portfolio is already empty!")
+            
+            elif choice == "6":
+                print("\n" + "="*50)
+                print("Thank you for using Stock Portfolio Tracker!")
+                print("Goodbye!")
+                print("="*50)
+                break
+            
             else:
-                print("Invalid choice. Portfolio not saved.")
-        except ValueError:
-            print("Invalid input. Portfolio not saved.")
-    
-    print("\nThank you for using Stock Portfolio Tracker!")
-
-
-def save_to_txt(portfolio, total_investment):
-    filename = "portfolio_summary.txt"
-    
-    with open(filename, 'w') as file:
-        file.write("=" * 50 + "\n")
-        file.write("PORTFOLIO SUMMARY\n")
-        file.write("=" * 50 + "\n\n")
+                print("Invalid choice! Enter 1 6.")
         
-        file.write("Stock Holdings:\n")
-        file.write("-" * 40 + "\n")
-        file.write(f"{'Stock':<10} {'Qty':<10} {'Price/Share':<15} {'Total Value':<15}\n")
-        file.write("-" * 40 + "\n")
-        
-        for stock, details in portfolio.items():
-            file.write(f"{stock:<10} {details['quantity']:<10} ${details['price_per_share']:<14.2f} ${details['total_value']:<14.2f}\n")
-        
-        file.write("-" * 40 + "\n\n")
-        file.write(f"TOTAL INVESTMENT: ${total_investment:.2f}\n")
-    
-    print(f"\nPortfolio saved to {filename}")
-
-
-def save_to_csv(portfolio, total_investment):
-    import csv
-    
-    filename = "portfolio_summary.csv"
-    
-    with open(filename, 'w', newline='') as file:
-        writer = csv.writer(file)
-        
-        writer.writerow(["Stock", "Quantity", "Price per Share", "Total Value"])
-        
-        for stock, details in portfolio.items():
-            writer.writerow([
-                stock,
-                details['quantity'],
-                f"${details['price_per_share']:.2f}",
-                f"${details['total_value']:.2f}"
-            ])
-        
-        writer.writerow([])
-        writer.writerow(["TOTAL INVESTMENT", "", "", f"${total_investment:.2f}"])
-    
-    print(f"\nPortfolio saved to {filename}")
+        except KeyboardInterrupt:
+            print("\nProgram interrupted. Exiting...")
+            break
+        except Exception as e:
+            print(f"Error: {e}")
+            continue
 
 
 def quick_example():
-    print("=" * 50)
-    print("QUICK EXAMPLE PORTFOLIO")
-    print("=" * 50)
-    
-    stock_prices = {"AAPL": 180, "TSLA": 250, "GOOGL": 135.50}
+    print("\n" + "="*50)
+    print("QUICK EXAMPLE")
+    print("="*50)
     
     example_portfolio = {
-        "AAPL": {"quantity": 10, "price_per_share": stock_prices["AAPL"]},
-        "TSLA": {"quantity": 5, "price_per_share": stock_prices["TSLA"]},
-        "GOOGL": {"quantity": 8, "price_per_share": stock_prices["GOOGL"]}
+        "AAPL": 10,
+        "TSLA": 5,
+        "GOOGL": 8
+    }
+    
+    example_prices = {
+        "AAPL": 180.25,
+        "TSLA": 250.75,
+        "GOOGL": 135.50
     }
     
     total = 0
+    print("\nExample Portfolio:")
+    print("-"*45)
+    print(f"{'Stock':<8} {'Qty':<8} {'Price':<12} {'Value':<15}")
+    print("-"*45)
     
-    print("\nStock Holdings:")
-    print("-" * 40)
-    print(f"{'Stock':<10} {'Qty':<10} {'Price/Share':<15} {'Total Value':<15}")
-    print("-" * 40)
+    for stock, qty in example_portfolio.items():
+        value = example_prices[stock] * qty
+        total += value
+        print(f"{stock:<8} {qty:<8} ${example_prices[stock]:<11.2f} ${value:<14.2f}")
     
-    for stock, details in example_portfolio.items():
-        stock_value = details['quantity'] * details['price_per_share']
-        total += stock_value
-        print(f"{stock:<10} {details['quantity']:<10} ${details['price_per_share']:<14.2f} ${stock_value:<14.2f}")
+    print("-"*45)
+    print(f"\nTOTAL: ${total:.2f}")
     
-    print("-" * 40)
-    print(f"\nTOTAL INVESTMENT: ${total:.2f}")
+    input("\nPress Enter to continue...")
 
 
 def main():
-    print("Welcome to Stock Portfolio Tracker!")
-    print("\nChoose an option:")
-    print("1. Build your own portfolio")
-    print("2. See a quick example")
-    print("3. Exit")
+    print("\n" + "="*60)
+    print("WELCOME TO STOCK PORTFOLIO TRACKER")
+    print("="*60)
     
-    try:
-        choice = int(input("\nEnter your choice (1-3): "))
+    while True:
+        print("\nMAIN MENU:")
+        print("1. Start Stock Portfolio Tracker")
+        print("2. See Quick Example")
+        print("3. Exit Program")
+        print("-"*40)
         
-        if choice == 1:
-            stock_portfolio_tracker()
-        elif choice == 2:
-            quick_example()
-        elif choice == 3:
-            print("Goodbye!")
-        else:
-            print("Invalid choice. Please run the program again.")
-    except ValueError:
-        print("Invalid input. Please enter a number.")
+        try:
+            choice = input("\nEnter choice (1 3): ").strip()
+            
+            if choice == "1":
+                stock_portfolio_tracker()
+                continue
+            
+            elif choice == "2":
+                quick_example()
+            
+            elif choice == "3":
+                print("\nGoodbye! Thank you for using our program.")
+                break
+            
+            else:
+                print("Invalid choice! Enter 1 3.")
+        
+        except KeyboardInterrupt:
+            print("\nProgram stopped by user.")
+            break
+        except Exception as e:
+            print(f"Error: {e}")
 
 
 if __name__ == "__main__":
     main()
-
